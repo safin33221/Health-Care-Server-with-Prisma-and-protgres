@@ -36,25 +36,25 @@ const createDoctor = catchAsync(async (req: Request, res: Response) => {
     })
 });
 
-// const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
-//     const filters = pick(req.query, userFilterableFields) // searching , filtering
-//     const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]) // pagination and sorting
+const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 
-//     const result = await UserService.getAllFromDB(filters, options);
+    const { page, limit } = req.query
+    const result = await UserService.getAllFromDB({ page: Number(page), limit: Number(limit) });
 
-//     sendResponse(res, {
-//         statusCode: 200,
-//         success: true,
-//         message: "User retrive successfully!",
-//         meta: result.meta,
-//         data: result.data
-//     })
-// })
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "User retrieve successfully!",
+        // meta: result.meta,
+        data: result
+    })
+})
 
 
-export const userController = {
+export const UserController = {
     createPatient,
     createAdmin,
     createDoctor,
+    getAllFromDB
 
 }
