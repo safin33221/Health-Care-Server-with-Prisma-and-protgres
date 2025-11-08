@@ -14,4 +14,25 @@ router.post("/create-patient",
     userController.createPatient
 )
 
+
+router.post(
+    "/create-admin",
+
+    fileUploader.upload.single('file'),
+    (req: Request, res: Response, next: NextFunction) => {
+        req.body = userValidation.createAdminValidationSchema.parse(JSON.parse(req.body.data))
+        return userController.createAdmin(req, res, next)
+    }
+);
+
+router.post(
+    "/create-doctor",
+    fileUploader.upload.single('file'),
+    (req: Request, res: Response, next: NextFunction) => {
+        console.log(JSON.parse(req.body.data))
+        req.body = userValidation.createDoctorValidationSchema.parse(JSON.parse(req.body.data))
+        return userController.createDoctor(req, res, next)
+    }
+);
+
 export const userRoutes = router
