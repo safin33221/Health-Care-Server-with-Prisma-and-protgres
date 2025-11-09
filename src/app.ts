@@ -6,6 +6,8 @@ import config from './config';
 import { uptime } from 'process';
 import { timeStamp } from 'console';
 import router from './app/routes';
+import cookieParser from 'cookie-parser';
+
 
 const app: Application = express();
 app.use(cors({
@@ -16,6 +18,7 @@ app.use(cors({
 //parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser())
 
 app.use('/api/v1', router)
 
