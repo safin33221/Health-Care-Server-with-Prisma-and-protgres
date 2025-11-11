@@ -3,7 +3,7 @@ import { ScheduleController } from "./schdule.controller";
 
 const router = Router()
 
-
+router.get("/scheduleForDoctor", ScheduleController.scheduleForDoctor)
 
 router.post(
     "/",
