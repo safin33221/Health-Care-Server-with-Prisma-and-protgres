@@ -3,6 +3,7 @@ import catchAsync from "../../shared/catchAsync"
 import sendResponse from "../../shared/sendResponse"
 import { ScheduleService } from "./schedule.service"
 import pick from "../../helpers/pick"
+import { IJwtPayload } from "../../types/common"
 
 const createSchedule = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
@@ -14,10 +15,11 @@ const createSchedule = catchAsync(async (req: Request, res: Response, next: Next
         data: result
     })
 })
-const scheduleForDoctor = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const scheduleForDoctor = catchAsync(async (req: Request & { user?: IJwtPayload }, res: Response, next: NextFunction) => {
+    const user = req.user
     const option = pick(req.query, ["page", "limit", "sortBy", "sortOrder"])
     const filter = pick(req.query, ["startDateTime", "endDateTime"])
-    const result = await ScheduleService.scheduleForDoctor(filter, option)
+    const result = await ScheduleService.scheduleForDoctor(user as IJwtPayload, filter, option)
     sendResponse(res, {
         statusCode: 201,
         success: true,

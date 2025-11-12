@@ -2,6 +2,7 @@ import { addHours, addMinutes, format } from "date-fns";
 import { prisma } from "../../shared/prisma";
 import { IOptions, paginationHelper } from "../../helpers/paginationHelpers";
 import { Prisma } from "@prisma/client";
+import { IJwtPayload } from "../../types/common";
 
 const createSchedule = async (payload: any) => {
     const { startTime, endTime, startDate, endDate } = payload;
@@ -64,11 +65,20 @@ const createSchedule = async (payload: any) => {
 
 
 
-const scheduleForDoctor = async (filters: any, option: IOptions) => {
+const scheduleForDoctor = async (user: IJwtPayload, filters: any, option: IOptions) => {
     const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(option)
     const { startDateTime: filterStartDateTime, endDateTime: filterEndDateTime } = filters
 
     const andCondition: Prisma.ScheduleWhereInput[] = []
+
+    const doctorSchedule = await prisma.doctorSchedule.findMany({
+        where: {
+            doctor: {
+                email: user.email
+            }
+        },
+        select: { scheduleId: true }
+    })
 
     if (filterStartDateTime && filterEndDateTime) {
         andCondition.push({
@@ -77,17 +87,32 @@ const scheduleForDoctor = async (filters: any, option: IOptions) => {
         })
     }
 
+    const doctorScheduleIds = doctorSchedule.map((schedule) => schedule.scheduleId)
     const whereCondition: Prisma.ScheduleWhereInput =
         andCondition.length > 0 ? { AND: andCondition } : {}
 
     const result = await prisma.schedule.findMany({
-        where: whereCondition,
+        where: {
+            ...whereCondition,
+            id: {
+                notIn: doctorScheduleIds
+            }
+
+        },
         skip,
         take: limit,
         orderBy: sortBy ? { [sortBy]: sortOrder } : { createdAt: "desc" }
     })
 
-    const total = await prisma.schedule.count({ where: whereCondition })
+    const total = await prisma.schedule.count({
+        where: {
+            ...whereCondition,
+            id: {
+                notIn: doctorScheduleIds
+            }
+
+        }
+    })
 
     return {
         meta: { page, limit, total },

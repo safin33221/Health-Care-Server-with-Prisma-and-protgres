@@ -1,6 +1,7 @@
 import { prisma } from "../../shared/prisma"
+import { IJwtPayload } from "../../types/common"
 
-const createDoctorSchedule = async (user: any, payload: { schedulesIds: string[] }) => {
+const createDoctorSchedule = async (user: IJwtPayload, payload: { schedulesIds: string[] }) => {
 
     const doctorData = await prisma.doctor.findUniqueOrThrow({
         where: {
