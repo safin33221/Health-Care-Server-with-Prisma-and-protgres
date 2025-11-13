@@ -5,7 +5,10 @@ import { prisma } from "../../shared/prisma";
 import { doctorSearchableFields } from "./doctor.constant";
 import { IOptions, paginationHelper } from "../../helpers/paginationHelpers";
 import { IDoctorUpdateInput } from "./doctor.interface";
-
+import ApiError from "../../errors/apiErrors";
+import httpStatus from 'http-status';
+import { openai } from "../../helpers/openRouter";
+import { extractJsonFromMessage } from "../../helpers/extractJsonFromMessage";
 
 const getAllFromDB = async (filters: any, options: IOptions) => {
 
@@ -25,6 +28,21 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
         })
     }
 
+    if (specialties && specialties.length > 0) {
+        andCondition.push({
+            doctorSpecialties: {
+                some: {
+                    specialities: {
+                        title: {
+                            contains: specialties,
+                            mode: "insensitive"
+                        }
+                    }
+                }
+            }
+        })
+    }
+
     if (Object.keys(filterData).length > 0) {
         const filterCondition = Object.keys(filterData).map(key => ({
             [key]: {
@@ -38,7 +56,14 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
         where: whereCondition,
         skip,
         take: limit,
-        orderBy: { [sortBy]: sortOrder }
+        orderBy: { [sortBy]: sortOrder },
+        include: {
+            doctorSpecialties: {
+                include: {
+                    specialities: true
+                }
+            }
+        }
     })
 
     const total = await prisma.doctor.count({
@@ -106,8 +131,65 @@ const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) =>
 
 
 }
+const getAiSuggestion = async (payload: { symptoms: string }) => {
+    if (!(payload && payload.symptoms)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Symptom is required")
+    }
+
+    const doctors = await prisma.doctor.findMany({
+        where: {
+            isDeleted: false,
+
+        },
+        include: {
+            doctorSpecialties: {
+                include: {
+                    specialities: true
+                }
+            }
+        }
+    })
+
+    console.log("doctor data loaded ......\n");
+    const prompt = `
+You are a medical assistant AI. Based on the patient's symptoms, suggest the top 3 most suitable doctors.
+Each doctor has specialties and years of experience.
+Only suggest doctors who are relevant to the given symptoms.
+
+Symptoms: ${payload.symptoms}
+
+Here is the doctor list (in JSON):
+${JSON.stringify(doctors, null, 2)}
+
+Return your response in JSON format with full individual doctor data. 
+`;
+
+
+    console.log("analyzing ......\n");
+
+    const completion = await openai.chat.completions.create({
+        model: 'z-ai/glm-4.5-air:free',
+        messages: [
+            {
+                role: "system",
+                content:
+                    "You are a helpful AI medical assistant that provides doctor suggestions.",
+            },
+            {
+                role: 'user',
+                content: prompt,
+            }
+        ],
+    });
+    const result = await extractJsonFromMessage(completion.choices[0].message)
+    console.log(result);
+    return result
+
+
+}
 
 export const DoctorService = {
     getAllFromDB,
-    updateIntoDB
+    updateIntoDB,
+    getAiSuggestion
 }
