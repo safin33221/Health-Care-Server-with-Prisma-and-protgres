@@ -5,7 +5,7 @@ import httpStatus from "http-status"
 
 const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
 
-    let statusCode: number = httpStatus.INTERNAL_SERVER_ERROR;
+    let statusCode: number = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
     let success = false;
     let message = err.message || "Something went wrong!";
     let error = err;
@@ -24,7 +24,7 @@ const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFun
         if (error.coe == "P2003") {
             message = "Foreign key constraint failed"
             error = err.meta
-              statusCode = httpStatus.BAD_REQUEST
+            statusCode = httpStatus.BAD_REQUEST
         }
     } else if (error instanceof Prisma.PrismaClientValidationError) {
         message = "Validation Error"
@@ -33,7 +33,7 @@ const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFun
     } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
         message = "Unknown Prisma error occurred"
         error = err.message
-        statusCode = httpStatus.BAD_REQUEST 
+        statusCode = httpStatus.BAD_REQUEST
     } else if (error instanceof Prisma.PrismaClientInitializationError) {
         message = "Failed to initialize prisma"
         error = err.message
