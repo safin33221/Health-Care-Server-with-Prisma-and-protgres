@@ -1,4 +1,4 @@
-import { Doctor, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 ;
 
 import { prisma } from "../../shared/prisma";
@@ -54,6 +54,54 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
 
 
 const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) => {
+
+    const { specialties, ...doctorData } = payload;
+
+    return await prisma.$transaction(async (tnx) => {
+        if (specialties && specialties.length > 0) {
+            const deleteSpecialties = specialties.filter((specialty) => specialty.isDeleted)
+            for (const specialty of deleteSpecialties) {
+                await tnx.doctorSpecialties.deleteMany({
+                    where: {
+                        doctorId: id,
+                        specialitiesId: specialty.specialtyId
+                    }
+                })
+            }
+
+            const createSpecialties = specialties.filter((specialty) => !specialty.isDeleted)
+
+            for (const specialty of createSpecialties) {
+                await tnx.doctorSpecialties.createMany({
+                    data: {
+                        doctorId: id,
+                        specialitiesId: specialty.specialtyId
+                    }
+                })
+            }
+        }
+        const doctorInfo = await tnx.doctor.findUniqueOrThrow({
+            where: {
+                id: id
+            }
+        })
+
+        const updatedData = await tnx.doctor.update({
+            where: { id: doctorInfo.id },
+            data: doctorData,
+            include: {
+                doctorSpecialties: {
+                    include: {
+                        specialities: true
+                    }
+                }
+            }
+        })
+
+        return updatedData
+
+    })
+
 
 
 
