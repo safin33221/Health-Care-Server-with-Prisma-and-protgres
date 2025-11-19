@@ -10,6 +10,10 @@ export default {
     cloud_name: process.env.cloud_name,
     api_key: process.env.api_key,
     api_secret: process.env.api_secret,
-    OpenRouter_API_KEY: process.env.OpenRouter_API_KEY
+    OpenRouter_API_KEY: process.env.OpenRouter_API_KEY,
+    strip: {
+        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+        STRIPE_WEBHOOK_SECRET:process.env.STRIPE_WEBHOOK_SECRET
+    }
 
 }

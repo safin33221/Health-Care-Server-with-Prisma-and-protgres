@@ -14,6 +14,9 @@ importers:
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
+      body-parser:
+        specifier: ^2.2.0
+        version: 2.2.0
       cloudinary:
         specifier: ^2.8.0
         version: 2.8.0
@@ -44,6 +47,12 @@ importers:
       openai:
         specifier: ^6.9.0
         version: 6.9.0(zod@4.1.12)
+      stripe:
+        specifier: ^20.0.0
+        version: 20.0.0(@types/node@24.10.1)
+      uuid:
+        specifier: ^9.0.1
+        version: 9.0.1
       zod:
         specifier: ^4.1.12
         version: 4.1.12
@@ -66,6 +75,9 @@ importers:
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
+      '@types/uuid':
+        specifier: ^11.0.0
+        version: 11.0.0
       prisma:
         specifier: ^6.19.0
         version: 6.19.0(typescript@5.9.3)
@@ -195,6 +207,10 @@ packages:
 
   '@types/strip-json-comments@0.0.30':
     resolution: {integrity: sha512-7NQmHra/JILCd1QqpSzl8+mJRc8ZHz3uDm8YV1Ks9IhK0epEiTw8aIErbvH9PI+6XbqhyIQy3462nEsn7UVzjQ==}
+
+  '@types/uuid@11.0.0':
+    resolution: {integrity: sha512-HVyk8nj2m+jcFRNazzqyVKiZezyhDKrGUA3jlEcg/nZ6Ms+qHwocba1Y/AaVaznJTAM9xpdFSh+ptbNrhOGvZA==}
+    deprecated: This is a stub types definition. uuid provides its own type definitions, so you do not need this installed.
 
   accepts@2.0.0:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
@@ -833,6 +849,15 @@ packages:
     resolution: {integrity: sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==}
     engines: {node: '>=0.10.0'}
 
+  stripe@20.0.0:
+    resolution: {integrity: sha512-EaZeWpbJOCcDytdjKSwdrL5BxzbDGNueiCfHjHXlPdBQvLqoxl6AAivC35SPzTmVXJb5duXQlXFGS45H0+e6Gg==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@types/node': '>=16'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
@@ -906,6 +931,10 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  uuid@9.0.1:
+    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    hasBin: true
 
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
@@ -1059,6 +1088,10 @@ snapshots:
   '@types/strip-bom@3.0.0': {}
 
   '@types/strip-json-comments@0.0.30': {}
+
+  '@types/uuid@11.0.0':
+    dependencies:
+      uuid: 9.0.1
 
   accepts@2.0.0:
     dependencies:
@@ -1710,6 +1743,12 @@ snapshots:
 
   strip-json-comments@2.0.1: {}
 
+  stripe@20.0.0(@types/node@24.10.1):
+    dependencies:
+      qs: 6.14.0
+    optionalDependencies:
+      '@types/node': 24.10.1
+
   supports-preserve-symlinks-flag@1.0.0: {}
 
   tinyexec@1.0.2: {}
@@ -1785,6 +1824,8 @@ snapshots:
   unpipe@1.0.0: {}
 
   util-deprecate@1.0.2: {}
+
+  uuid@9.0.1: {}
 
   v8-compile-cache-lib@3.0.1: {}
 

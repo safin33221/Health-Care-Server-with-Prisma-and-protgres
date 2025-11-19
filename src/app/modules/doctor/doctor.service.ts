@@ -78,6 +78,28 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
 }
 
 
+const getDoctorById = async (id: string) => {
+    const result = await prisma.doctor.findUniqueOrThrow({
+        where: {
+            id
+        },
+        include: {
+            doctorSpecialties: {
+                include: {
+                    specialities: true
+                }
+            },
+            doctorSchedules: {
+                include: {
+                    schedule: true
+                }
+            }
+        }
+    })
+    return result
+
+}
+
 const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) => {
 
     const { specialties, ...doctorData } = payload;
@@ -191,5 +213,6 @@ Return your response in JSON format with full individual doctor data.
 export const DoctorService = {
     getAllFromDB,
     updateIntoDB,
-    getAiSuggestion
+    getAiSuggestion,
+    getDoctorById
 }

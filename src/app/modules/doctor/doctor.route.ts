@@ -7,6 +7,7 @@ router.get(
     DoctorController.getAllFromDB
 )
 
+router.get("/:id", DoctorController.getDoctorById)
 router.post("/suggestion", DoctorController.getAiSuggestion)
 router.patch(
     "/:id",
