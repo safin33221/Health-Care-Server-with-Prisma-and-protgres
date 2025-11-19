@@ -9,7 +9,7 @@ model Appointment {
     videoCallingId String
     status         AppointmentStatus @default(SCHEDULED)
     paymentStatus  PaymentStatus     @default(UNPAID)
-    createAt       DateTime          @default(now())
+    createdAt       DateTime          @default(now())
     updateAt       DateTime          @updatedAt
     payment        Payment?
     prescription   Prescription?

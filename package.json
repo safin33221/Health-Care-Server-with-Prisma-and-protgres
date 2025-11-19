@@ -23,6 +23,7 @@
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
+    "nanoid": "^3.3.11",
     "openai": "^6.9.0",
     "stripe": "^20.0.0",
     "uuid": "^9.0.1",
