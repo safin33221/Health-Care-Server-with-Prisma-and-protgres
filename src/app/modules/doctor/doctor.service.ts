@@ -62,7 +62,8 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
                 include: {
                     specialities: true
                 }
-            }
+            },
+            reviews: true
         }
     })
 
