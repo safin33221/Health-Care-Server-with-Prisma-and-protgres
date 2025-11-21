@@ -3,7 +3,7 @@ import { prisma } from "../../shared/prisma";
 import { nanoid } from 'nanoid'
 import stripe from "../../helpers/stripe";
 import { paginationHelper } from "../../helpers/paginationHelpers";
-import { AppointmentStatus, Prisma, UserRole } from "@prisma/client";
+import { AppointmentStatus, PaymentStatus, Prisma, UserRole } from "@prisma/client";
 import ApiError from "../../errors/apiErrors";
 import httpStatusCode from "http-status"
 
@@ -193,8 +193,56 @@ const updateAppointmentStatus = async (appointmentId: string, appointmentStatus:
 
 }
 
+
+const cancelUnpaidAppointment = async () => {
+    const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000)
+    const unpaidAppointments = await prisma.appointment.findMany({
+        where: {
+            createdAt: {
+                lte: thirtyMinAgo
+            },
+            paymentStatus: PaymentStatus.UNPAID
+        }
+    })
+
+    const cancelUnpaidAppointmentIds = unpaidAppointments.map(appointment => appointment.id)
+
+    return await prisma.$transaction(async (tnx) => {
+        await prisma.payment.deleteMany({
+            where: {
+                appointmentId: {
+                    in: cancelUnpaidAppointmentIds
+                }
+            }
+        })
+
+        await prisma.appointment.deleteMany({
+            where: {
+                id: {
+                    in: cancelUnpaidAppointmentIds
+                }
+            }
+        })
+
+        for (const unpaidAppointment of unpaidAppointments) {
+            await tnx.doctorSchedule.update({
+                where: {
+                    doctorId_scheduleId: {
+                        doctorId: unpaidAppointment.doctorId,
+                        scheduleId: unpaidAppointment.scheduleId
+                    }
+                },
+                data: {
+                    isBlocked: false
+                }
+            })
+        }
+    })
+}
+
 export const AppointmentService = {
     createAppointment,
     getMyAppointment,
-    updateAppointmentStatus
+    updateAppointmentStatus,
+    cancelUnpaidAppointment
 }
